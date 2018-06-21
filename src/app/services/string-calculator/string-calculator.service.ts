@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {RandomNumberService} from '../random-number/random-number.service';
 import {Observable} from 'rxjs/Observable';
 import 'rxjs/Rx';
+import {observable} from 'rxjs/symbol/observable';
 
 @Injectable()
 export class StringCalculatorService {
@@ -10,14 +11,6 @@ export class StringCalculatorService {
   }
 
   getSum(s: string): Observable<number> {
-    // Observable.of(s).pipe(expand(val => {
-    //   return Observable.from(
-    //   val
-    //     .replace('\n', ',')
-    //   .split(','))
-    // )
-    // });
-
     if (s === '') {
       return Observable.of(0);
     } else if (!s) {
@@ -31,5 +24,16 @@ export class StringCalculatorService {
       .split(',')
       .forEach(n => result += +n);
     return Observable.of(Math.ceil(result));
+  }
+
+  getRunningTotal(s: string): Observable<number> {
+    const numbers = s.split(',');
+    let previousValue = 0;
+    const sum: number[] = [];
+    numbers.forEach(number => {
+      previousValue += +number;
+      sum.push(previousValue);
+    });
+    return Observable.of(...sum);
   }
 }

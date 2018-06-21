@@ -94,4 +94,25 @@ fdescribe('StringCalculatorService', () => {
           });
       }));
   });
+
+  describe('getRunningTotal', () => {
+    [
+      {input: '1,2', output: [1, 3]},
+      {input: '3,4,5,6', output: [3, 7, 12, 18]},
+      {input: '1,3,6,4,5', output: [1, 4, 10, 14, 19]}
+    ].forEach((x) => {
+      it('should return emit multiple observables', inject([StringCalculatorService], (service: StringCalculatorService) => {
+        const runningTotal = service.getRunningTotal(x.input);
+        const values = [];
+        runningTotal
+          .subscribe(
+            total => values.push(total),
+            null,
+            () => {
+              expect(values).toEqual(x.output);
+            }
+          );
+      }));
+    });
+  });
 });
