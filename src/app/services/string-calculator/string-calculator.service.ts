@@ -10,20 +10,27 @@ export class StringCalculatorService {
   constructor(private rngService: RandomNumberService) {
   }
 
-  getSum(s: string): Observable<number> {
+  getSum(s: string): Observable<any> {
+    console.log('R was replaced with 3.14');
     if (s === '') {
       return Observable.of(0);
-    } else if (!s) {
+    }
+    else if (!s) {
       return Observable.throw('Get Gud');
     }
 
-    let result = 0;
+    let sum = 0;
     s.replace(/F/g, '5')
       .replace(/R/g, this.rngService.rng().toString())
       .replace(/\n/g, ',')
       .split(',')
-      .forEach(n => result += +n);
-    return Observable.of(Math.ceil(result));
+      .forEach(n => sum += +n);
+
+    const result = Math.ceil(sum);
+    if (result % 3 === 0) {
+      return Observable.of('fizz');
+    }
+    return Observable.of(result);
   }
 
   getRunningTotal(s: string): Observable<number> {

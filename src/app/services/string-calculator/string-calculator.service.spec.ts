@@ -1,10 +1,10 @@
-import {TestBed, inject} from '@angular/core/testing';
+import { TestBed, inject } from '@angular/core/testing';
 
-import {StringCalculatorService} from './string-calculator.service';
-import {Observable} from 'rxjs/Observable';
-import {RandomNumberService} from '../random-number/random-number.service';
+import { StringCalculatorService } from './string-calculator.service';
+import { Observable } from 'rxjs/Observable';
+import { RandomNumberService } from '../random-number/random-number.service';
 
-fdescribe('StringCalculatorService', () => {
+describe('StringCalculatorService', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [StringCalculatorService, RandomNumberService]
@@ -25,9 +25,9 @@ fdescribe('StringCalculatorService', () => {
 
     it('should return the sum of two numbers in the string',
       inject([StringCalculatorService], (service: StringCalculatorService) => {
-        const result = service.getSum('1,2');
+        const result = service.getSum('1,3');
 
-        expect(result).toEqual(Observable.of(3));
+        expect(result).toEqual(Observable.of(4));
       }));
 
     it('should return the sum of any numbers in the string',
@@ -46,9 +46,9 @@ fdescribe('StringCalculatorService', () => {
 
     it('should parse F as 5',
       inject([StringCalculatorService], (service: StringCalculatorService) => {
-        const result = service.getSum('F,F,5');
+        const result = service.getSum('F,F,6');
 
-        expect(result).toEqual(Observable.of(15));
+        expect(result).toEqual(Observable.of(16));
       }));
 
     it('should handle random numbers',
@@ -88,18 +88,39 @@ fdescribe('StringCalculatorService', () => {
         const result = service.getSum(null);
 
         result.subscribe(() => {
-          },
+        },
           (error) => {
             expect(error).toEqual('Get Gud');
           });
       }));
+    [
+      '2,4', '15,6', '3,6,9'
+    ].forEach((x) => {
+      it('when sum is divisible by 3 it should return fizz',
+        inject([StringCalculatorService, RandomNumberService], (service: StringCalculatorService, rngService: RandomNumberService) => {
+          const result: Observable<string> = service.getSum(x);
+          expect(result).toEqual(Observable.of('fizz'));
+        }));
+    });
+
+    
+    describe('should log', () => {
+      it('when called with R', 
+        inject([StringCalculatorService, RandomNumberService], (service: StringCalculatorService, rngService: RandomNumberService) => {
+          spyOn(rngService, 'rng').and.returnValue(3.14);
+          spyOn(console, 'log').and.callThrough();
+          service.getSum('R');
+          expect(console.log).toHaveBeenCalledWith('R was replaced with ' + 3.14);
+        })
+      )
+    });
   });
 
   describe('getRunningTotal', () => {
     [
-      {input: '1,2', output: [1, 3]},
-      {input: '3,4,5,6', output: [3, 7, 12, 18]},
-      {input: '1,3,6,4,5', output: [1, 4, 10, 14, 19]}
+      { input: '1,2', output: [1, 3] },
+      { input: '3,4,5,6', output: [3, 7, 12, 18] },
+      { input: '1,3,6,4,5', output: [1, 4, 10, 14, 19] }
     ].forEach((x) => {
       it('should return emit multiple observables', inject([StringCalculatorService], (service: StringCalculatorService) => {
         const runningTotal = service.getRunningTotal(x.input);
